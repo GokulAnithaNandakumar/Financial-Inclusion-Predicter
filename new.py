@@ -100,21 +100,47 @@ ax.set_ylabel('Predicted Values')
 # Display the regression plot in Streamlit
 st.pyplot(fig)
 
-# Visualization: Boxplot for 2011 and 2014
-st.write("### Boxplot of 2011 Values for Each Indicator")
-boxplot_fig, boxplot_ax = plt.subplots(figsize=(10, 6))
-sns.boxplot(x='Indicator Code', y='2011', data=df, ax=boxplot_ax)
-boxplot_ax.set_xticks(rotation=90)
-boxplot_ax.set_title('Boxplot of 2011 Values for Each Indicator')
-st.pyplot(boxplot_fig)
+# Disable the PyplotGlobalUseWarning
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
+# Display basic information about the dataset
+st.write("### Dataset Information")
+st.write("RangeIndex: 152048 entries, 0 to 152047")
+st.write("Data columns (total 8 columns):")
+st.write(" #   Column              Non-Null Count   Dtype  ")
+st.write("---  ------              --------------   -----")
+st.write(" 0   Country Name        152048 non-null  object")
+st.write(" 1   Country Code        152048 non-null  object")
+st.write(" 2   Indicator Name      152048 non-null  object")
+st.write(" 3   Indicator Code      152048 non-null  object")
+st.write(" 4   2011                59169 non-null   float64")
+st.write(" 5   2014                78739 non-null   float64")
+st.write(" 6   MRV                 126703 non-null  float64")
+st.write(" 7   FinancialInclusion  152048 non-null  int64  ")
+st.write("dtypes: float64(3), int64(1), object(4)")
+st.write("memory usage: 9.3+ MB")
+
+
+# Display the first few rows of the dataset
+st.write("### First Few Rows of the Dataset")
+st.write(df.head())
+
+# Summary statistics
+st.write("### Summary Statistics")
+st.write(df.describe())
+
+# Check for missing values
+st.write("### Missing Values")
+st.write(df.isnull().sum())
+
 
 # Visualization: Distribution of MRV
 st.write("### Distribution of MRV")
-hist_fig, hist_ax = plt.subplots(figsize=(8, 5))
-sns.histplot(df['MRV'].dropna(), kde=True, bins=20, ax=hist_ax)
-hist_ax.set_title('Distribution of MRV')
-hist_ax.set_xlabel('MRV')
-st.pyplot(hist_fig)
+plt.figure(figsize=(8, 5))
+sns.histplot(df['MRV'].dropna(), kde=True, bins=20)
+plt.title('Distribution of MRV')
+plt.xlabel('MRV')
+st.pyplot()
 
 # Select a subset of indicators for better visualization
 indicators_to_plot = df['Indicator Code'].unique()[:10]  # Adjust the number as needed
@@ -123,47 +149,40 @@ indicators_to_plot = df['Indicator Code'].unique()[:10]  # Adjust the number as 
 df_subset = df[df['Indicator Code'].isin(indicators_to_plot)]
 
 # Visualization: Violin plot for 2011 values
-st.write("### Violin Plot of 2011 Values for Selected Indicators")
-violin_fig, violin_ax = plt.subplots(figsize=(12, 8))
-sns.violinplot(x='Indicator Code', y='2011', data=df_subset, ax=violin_ax)
-violin_ax.set_xticks(rotation=45, ha='right')
-violin_ax.set_title('Violin Plot of 2011 Values for Selected Indicators')
-st.pyplot(violin_fig)
+st.write("### Violin plot for 2011 values")
+plt.figure(figsize=(12, 8))
+sns.violinplot(x='Indicator Code', y='2011', data=df_subset)
+plt.xticks(rotation=45, ha='right')
+plt.title('Violin Plot of 2011 Values for Selected Indicators')
+st.pyplot()
 
 # Correlation Matrix
+st.write("### Correlation Matrix")
+
 numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns
 correlation_matrix = df[numeric_columns].corr()
-st.write("### Correlation Matrix")
-corr_fig, corr_ax = plt.subplots(figsize=(12, 8))
-sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", ax=corr_ax)
-corr_ax.set_title('Correlation Matrix')
-st.pyplot(corr_fig)
+plt.figure(figsize=(12, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Matrix')
+st.pyplot()
 
-# Pairplot
-st.write("### Pairplot of Numerical Features")
-pairplot_fig = sns.pairplot(df[numeric_columns], diag_kind='kde')
-pairplot_fig.fig.suptitle('Pairplot of Numerical Features', y=1.02)
-st.pyplot(pairplot_fig)
-
-# Countplot
-st.write("### Countplot of Categorical Column")
-countplot_fig, countplot_ax = plt.subplots(figsize=(10, 6))
-sns.countplot(x='Indicator Name', data=df, ax=countplot_ax)
-countplot_ax.set_xticks(rotation=45)
-countplot_ax.set_title('Countplot of Categorical Column')
-st.pyplot(countplot_fig)
 
 # Scatter Plot
-st.write("### Scatter Plot of 2011 vs 2014")
-scatter_fig, scatter_ax = plt.subplots(figsize=(10, 6))
-sns.scatterplot(x='2011', y='2014', data=df[numeric_columns], ax=scatter_ax)
-scatter_ax.set_title('Scatter Plot of 2011 vs 2014')
-st.pyplot(scatter_fig)
+st.write("### Scatter Plot")
 
-# Bar Plot
-st.write("### Bar Plot of 2011 by Category")
-barplot_fig, barplot_ax = plt.subplots(figsize=(12, 8))
-sns.barplot(x='Indicator Name', y='2011', data=df, ax=barplot_ax)
-barplot_ax.set_xticks(rotation=45)
-barplot_ax.set_title('Bar Plot of 2011 by Category')
-st.pyplot(barplot_fig)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='2011', y='2014', data=df[numeric_columns])
+plt.title('Scatter Plot of 2011 vs 2014')
+st.pyplot()
+
+
+# Pairplot
+st.write("### Pairplot")
+
+plt.figure()
+sns.pairplot(df[numeric_columns], diag_kind='kde')
+plt.suptitle('Pairplot of Numerical Features', y=1.02)
+st.pyplot()
+
+
+
