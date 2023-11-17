@@ -7,42 +7,37 @@ from sklearn.impute import SimpleImputer
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Load your dataset
+# Load dataset
 df = pd.read_csv('FINDEXData.csv')
 
-# Assuming 'FinancialInclusion' is your binary target variable
 df['FinancialInclusion'] = (df['2014'] > df['2011']).astype(int)
 
-# Select relevant features for classification
+
 classification_features = ['2011', '2014', 'MRV']
 
-# Drop rows with NaN values in the target variable for classification
 df_classification = df.dropna(subset=['FinancialInclusion'])
 
-# Split the data for classification
+# Split data for classification
 X_train_cls, X_test_cls, y_train_cls, y_test_cls = train_test_split(
     df_classification[classification_features], df_classification['FinancialInclusion'],
     test_size=0.2, random_state=42
 )
 
-# Impute missing values in classification features
 imputer_cls = SimpleImputer(strategy='mean')
 X_train_cls_imputed = pd.DataFrame(imputer_cls.fit_transform(X_train_cls), columns=X_train_cls.columns)
 X_test_cls_imputed = pd.DataFrame(imputer_cls.transform(X_test_cls), columns=X_test_cls.columns)
 
-# Create and train a Random Forest classifier
+# Random Forest classifier
 clf = RandomForestClassifier(n_estimators=100, random_state=42)
 clf.fit(X_train_cls_imputed, y_train_cls)
 
-# Streamlit app
 st.title("Financial Inclusion Predictor")
 
-# User input for new data
 a = st.text_input("Enter the values in the year 2011:")
 b = st.text_input("Enter the values in the year 2014:")
 c = st.text_input("Enter the new MRV Value:")
 
-# Make predictions on the new data
+# Make predictions
 if st.button("Predict"):
     new_data = pd.DataFrame({
         '2011': [float(a)],
@@ -52,7 +47,6 @@ if st.button("Predict"):
 
     new_prediction = clf.predict(new_data)
 
-    # Display the prediction
     if new_prediction[0] == 0:
         st.success("Prediction for new data: Not Financially included")
     if new_prediction[0] == 1:
@@ -63,34 +57,29 @@ st.title("Regression Plot")
 
 target_variable = 'MRV'
 
-# Select relevant features
 features_reg = ['2011', '2014', 'MRV']
 
-# Drop rows with NaN values in the target variable for regression
 df_regression = df.dropna(subset=[target_variable])
 
-# Split the data for regression
 X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(
     df_regression[features_reg], df_regression[target_variable],
     test_size=0.2, random_state=42
 )
 
-# Impute missing values in regression features
 imputer_reg = SimpleImputer(strategy='mean')
 X_train_reg_imputed = pd.DataFrame(imputer_reg.fit_transform(X_train_reg), columns=X_train_reg.columns)
 X_test_reg_imputed = pd.DataFrame(imputer_reg.transform(X_test_reg), columns=X_test_reg.columns)
 
-# Create and train a Random Forest regressor
+# train a Random Forest regressor
 regressor = RandomForestRegressor(n_estimators=100, random_state=42)
 regressor.fit(X_train_reg_imputed, y_train_reg)
 
-# Make predictions on the test set
 predictions_reg = regressor.predict(X_test_reg_imputed)
 
 # Create a DataFrame to hold the actual vs predicted values for regression
 result_df_reg = pd.DataFrame({'Actual': y_test_reg, 'Predicted': predictions_reg})
 
-# Plot the regression graph
+# regression graph
 fig, ax = plt.subplots(figsize=(10, 6))
 sns.regplot(x='Actual', y='Predicted', data=result_df_reg, scatter_kws={'alpha': 0.5}, ax=ax)
 ax.set_title('Regression Plot')
@@ -107,7 +96,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.write("### Dataset Information")
 st.write("RangeIndex: 152048 entries, 0 to 152047")
 st.write("Data columns (total 8 columns):")
-st.write(" #   Column              Non-Null Count   Dtype  ")
+st.write("     Column              Non-Null Count   Dtype  ")
 st.write("---  ------              --------------   -----")
 st.write(" 0   Country Name        152048 non-null  object")
 st.write(" 1   Country Code        152048 non-null  object")
@@ -129,9 +118,7 @@ st.write(df.head())
 st.write("### Summary Statistics")
 st.write(df.describe())
 
-# Check for missing values
-st.write("### Missing Values")
-st.write(df.isnull().sum())
+
 
 
 # Visualization: Distribution of MRV
